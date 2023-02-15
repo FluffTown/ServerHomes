@@ -1,5 +1,5 @@
 name: ServerHomes
-version: '${project.version}'
+version: '1.0'
 main: com.zip.serverhomes.Main
 api-version: 1.19
 commands:

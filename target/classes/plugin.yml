@@ -1,0 +1,14 @@
+name: ServerHomes
+version: '1.0-SNAPSHOT'
+main: com.zip.serverhomes.Main
+api-version: 1.19
+commands:
+  delhome:
+    description: delete a home
+    usage: /<command> [home]
+  sethome:
+    description: set a home
+    usage: /<command> [home]
+  home:
+    description: tp to a home
+    usage: /<command> [home]

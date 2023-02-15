@@ -8,5 +8,5 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="lib" path="D:/Programming/Spigot Java/.spigotjars/1.19.3/spigot-api-1.19.3-R0.1-20230215.101423-43-shaded.jar"/>
-	<classpathentry kind="output" path="target/classes"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

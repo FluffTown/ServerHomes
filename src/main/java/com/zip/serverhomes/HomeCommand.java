@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -20,10 +21,15 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
 		this.config = config;
 	}
 
+	public String color(String str) {
+		return ChatColor.translateAlternateColorCodes('&', str);
+	}
+
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!(sender instanceof Player)) {
-			sender.sendMessage("&8[&c!&8]&7 This command can only be used by a player.");
+			sender.sendMessage(color("&8[&c!&8]&7 This command can only be used by a player."));
 			return true;
 		}
 		final Player player = (Player) sender;
@@ -32,22 +38,22 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
 		Location destination = config.getLocation(uuid_prefix + home_name);
 		
 		if(label.equalsIgnoreCase("home")) {
-			if(destination == null) player.sendMessage("&8[&c!&8]&7 The home doesn't exist.");
+			if(destination == null) player.sendMessage(color("&8[&c!&8]&7 The home doesn't exist."));
 			else {
 				player.teleport(destination);
-				player.sendMessage("&8[&9i&8]&7 Teleported to the home.");
+				player.sendMessage(color("&8[&9i&8]&7 Teleported to the home."));
 			}
 		} else if(label.equalsIgnoreCase("sethome")) {
-			if(destination != null) player.sendMessage("&8[&9i&8]&7 The home has already been set.");
+			if(destination != null) player.sendMessage(color("&8[&9i&8]&7 The home has already been set."));
 			else {
 				config.set(uuid_prefix + home_name, player.getLocation());
-				player.sendMessage("&8[&9i&8]&7 Home set to your position.");
+				player.sendMessage(color("&8[&9i&8]&7 Home set to your position."));
 			}
 		} else if(label.equalsIgnoreCase("delhome")) {
-			if(destination == null) player.sendMessage("&8[&c!&8]&7 The home doesn't exit.");
+			if(destination == null) player.sendMessage(color("&8[&c!&8]&7 The home doesn't exit."));
 			else {
 				config.set(uuid_prefix + home_name, null);
-				player.sendMessage("&8[&9i&8]&7 Home deleted.");
+				player.sendMessage(color("&8[&9i&8]&7 Home deleted."));
 			}
 		} else return false;
 		return true;

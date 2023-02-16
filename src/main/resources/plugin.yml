@@ -4,11 +4,11 @@ main: com.zip.serverhomes.Main
 api-version: 1.19
 commands:
   delhome:
-    description: delete a home
+    description: Delete a home
     usage: /<command> [home]
   sethome:
-    description: set a home
+    description: Set a home
     usage: /<command> [home]
   home:
-    description: tp to a home
+    description: Teleport to a set home
     usage: /<command> [home]

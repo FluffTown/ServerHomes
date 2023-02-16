@@ -13,6 +13,8 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import com.zip.serverhomes.MessageUtils.Type;
+
 public class HomeCommand implements CommandExecutor, TabCompleter {
 	
 	private final FileConfiguration config;
@@ -29,31 +31,30 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!(sender instanceof Player)) {
-			sender.sendMessage(color("&8[&c!&8]&7 This command can only be used by a player."));
+			MessageUtils.sendMessage(sender, Type.ERROR, "This command can only be used by a player.");
 			return true;
 		}
+		
 		final Player player = (Player) sender;
 		String uuid_prefix = player.getUniqueId().toString() + "|";
 		String home_name = args.length == 0 ? "home" : args[0];
 		Location destination = config.getLocation(uuid_prefix + home_name);
 		
 		if(label.equalsIgnoreCase("home")) {
-			if(destination == null) player.sendMessage(color("&8[&c!&8]&7 The home doesn't exist."));
+			if(destination == null) MessageUtils.sendMessage(player, Type.ERROR, "The home doesn't exist.");
 			else {
+				MessageUtils.sendMessage(player, Type.INFO, "Teleported to the home.");
 				player.teleport(destination);
-				player.sendMessage(color("&8[&9i&8]&7 Teleported to the home."));
 			}
 		} else if(label.equalsIgnoreCase("sethome")) {
-			if(destination != null) player.sendMessage(color("&8[&9i&8]&7 The home has already been set."));
-			else {
-				config.set(uuid_prefix + home_name, player.getLocation());
-				player.sendMessage(color("&8[&9i&8]&7 Home set to your position."));
-			}
+			if(destination != null) MessageUtils.sendMessage(player, Type.WARN, "The home was already set. Overwriting.");
+			else MessageUtils.sendMessage(player, Type.INFO, "Home set to your position.");
+			config.set(uuid_prefix + home_name, player.getLocation());
 		} else if(label.equalsIgnoreCase("delhome")) {
-			if(destination == null) player.sendMessage(color("&8[&c!&8]&7 The home doesn't exit."));
+			if(destination == null) MessageUtils.sendMessage(player, Type.ERROR, "The home doesn't exit.");
 			else {
+				MessageUtils.sendMessage(player, Type.INFO, "Home deleted.");
 				config.set(uuid_prefix + home_name, null);
-				player.sendMessage(color("&8[&9i&8]&7 Home deleted."));
 			}
 		} else return false;
 		return true;

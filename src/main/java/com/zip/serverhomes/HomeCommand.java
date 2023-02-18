@@ -28,7 +28,6 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
 	}
 
 
-	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!(sender instanceof Player)) {
 			MessageUtils.sendMessage(sender, Type.ERROR, "This command can only be used by a player.");
@@ -59,13 +58,12 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
 		} else return false;
 		return true;
 	}
-	
-	@Override
+
 	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
 		if(!(sender instanceof Player)) return null;
 		if (label.equalsIgnoreCase("home") || label.equalsIgnoreCase("delhome")) {
 			if (args.length == 1) {
-				List<String> options = new ArrayList<>();
+				List<String> options = new ArrayList<String>();
 				Player player = (Player) sender;
 				String uuid_prefix = player.getUniqueId().toString();
 				Set<String> homes = config.getKeys(false);

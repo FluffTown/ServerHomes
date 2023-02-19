@@ -1,10 +1,9 @@
 package com.zip.serverhomes;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,18 +14,10 @@ import org.bukkit.entity.Player;
 
 import com.zip.serverhomes.MessageUtils.Type;
 
-public class HomeCommand implements CommandExecutor, TabCompleter {
+public class HomeCommands implements CommandExecutor, TabCompleter {
 	
 	private final FileConfiguration config;
-	
-	public HomeCommand(FileConfiguration config) {
-		this.config = config;
-	}
-
-	public String color(String str) {
-		return ChatColor.translateAlternateColorCodes('&', str);
-	}
-
+	public HomeCommands(FileConfiguration config) { this.config = config; }
 
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!(sender instanceof Player)) {
@@ -50,7 +41,7 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
 			else MessageUtils.sendMessage(player, Type.INFO, "Home set to your position.");
 			config.set(uuid_prefix + home_name, player.getLocation());
 		} else if(label.equalsIgnoreCase("delhome")) {
-			if(destination == null) MessageUtils.sendMessage(player, Type.ERROR, "The home doesn't exit.");
+			if(destination == null) MessageUtils.sendMessage(player, Type.ERROR, "The home doesn't exist.");
 			else {
 				MessageUtils.sendMessage(player, Type.INFO, "Home deleted.");
 				config.set(uuid_prefix + home_name, null);
@@ -63,7 +54,7 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
 		if(!(sender instanceof Player)) return null;
 		if (label.equalsIgnoreCase("home") || label.equalsIgnoreCase("delhome")) {
 			if (args.length == 1) {
-				List<String> options = new ArrayList<String>();
+				List<String> options = new LinkedList<String>();
 				Player player = (Player) sender;
 				String uuid_prefix = player.getUniqueId().toString();
 				Set<String> homes = config.getKeys(false);

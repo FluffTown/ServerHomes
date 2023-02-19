@@ -36,7 +36,7 @@ public class HomeAsCommand implements CommandExecutor, TabCompleter {
 				if(seen_players[i].getName().equalsIgnoreCase(args[0]))
 					alias_uuid = seen_players[i].getUniqueId().toString();
 			}
-			if(alias_uuid == null) MessageUtils.sendMessage(player, Type.ERROR, "Player "+args[0]+"has never joined the server.");
+			if(alias_uuid == null) MessageUtils.sendMessage(player, Type.ERROR, "Player "+args[0]+" has never joined the server.");
 			else {
 				MessageUtils.sendMessage(player, Type.INFO, "Home aliasing set to player "+args[0]+".");
 				config.set(player.getUniqueId().toString(), alias_uuid);
@@ -51,6 +51,7 @@ public class HomeAsCommand implements CommandExecutor, TabCompleter {
 			List<String> options = new LinkedList<String>();
 			OfflinePlayer[] seen_players = Bukkit.getOfflinePlayers();
 			for(OfflinePlayer p : seen_players) options.add(p.getName());
+			return options;
 		}
 		return null;
 	}

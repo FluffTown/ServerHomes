@@ -26,8 +26,9 @@ public class HomeCommands implements CommandExecutor, TabCompleter {
 		}
 		
 		final Player player = (Player) sender;
-		String uuid_prefix = player.getUniqueId().toString() + "|";
-		String home_name = args.length == 0 ? "home" : args[0];
+		String alias = config.getString(player.getUniqueId().toString(), "");
+		String uuid_prefix = (alias.isEmpty() ? player.getUniqueId().toString() : alias);
+		String home_name = args.length == 0 ? "|home" : "|"+args[0];
 		Location destination = config.getLocation(uuid_prefix + home_name);
 		
 		if(label.equalsIgnoreCase("home")) {
@@ -56,9 +57,11 @@ public class HomeCommands implements CommandExecutor, TabCompleter {
 			if (args.length == 1) {
 				List<String> options = new LinkedList<String>();
 				Player player = (Player) sender;
-				String uuid_prefix = player.getUniqueId().toString();
+				String alias = config.getString(player.getUniqueId().toString(), "");
+				String uuid_prefix = (alias.isEmpty() ? player.getUniqueId().toString() : alias);
 				Set<String> homes = config.getKeys(false);
 				for(String home : homes) {
+					if(home.length() == 36) continue;
 					String[] parts = home.split("\\|");
 					if(parts[0].equals(uuid_prefix)) options.add(parts[1]);
 				}

@@ -28,24 +28,34 @@ public class HomeCommands implements CommandExecutor, TabCompleter {
 		final Player player = (Player) sender;
 		String alias = config.getString(player.getUniqueId().toString(), "");
 		String uuid_prefix = (alias.isEmpty() ? player.getUniqueId().toString() : alias);
-		String home_name = args.length == 0 ? "|home" : "|"+args[0];
-		Location destination = config.getLocation(uuid_prefix + home_name);
 		
+		String home_name = args.length == 0 ? "home" : args[0];
+		String sanitized = home_name.replaceAll("[^A-Za-z0-9_-]", "");
+		if(sanitized.isEmpty()) {
+			MessageUtils.sendMessage(player, Type.ERROR, "Name given contains no valid characters.");
+			return true;
+		}
+		if(!home_name.equals(sanitized)) {
+			MessageUtils.sendMessage(player, Type.WARN, "Effective name will differ from the one given.");
+			home_name = sanitized;
+		}
+		
+		Location destination = config.getLocation(uuid_prefix + "|" + home_name);
 		if(label.equalsIgnoreCase("home")) {
-			if(destination == null) MessageUtils.sendMessage(player, Type.ERROR, "The home doesn't exist.");
+			if(destination == null) MessageUtils.sendMessage(player, Type.ERROR, "Name given is not associated with a home.");
 			else {
-				MessageUtils.sendMessage(player, Type.INFO, "Teleported to the home.");
+				MessageUtils.sendMessage(player, Type.INFO, "Teleported to \"" + home_name + "\".");
 				player.teleport(destination);
 			}
 		} else if(label.equalsIgnoreCase("sethome")) {
-			if(destination != null) MessageUtils.sendMessage(player, Type.WARN, "The home was already set. Overwriting.");
-			else MessageUtils.sendMessage(player, Type.INFO, "Home set to your position.");
-			config.set(uuid_prefix + home_name, player.getLocation());
+			if(destination != null) MessageUtils.sendMessage(player, Type.WARN, "Overwriting existing home associated with the given name.");
+			MessageUtils.sendMessage(player, Type.INFO, "Home \"" + home_name + "\" set to your position.");
+			config.set(uuid_prefix + "|" + home_name, player.getLocation());
 		} else if(label.equalsIgnoreCase("delhome")) {
-			if(destination == null) MessageUtils.sendMessage(player, Type.ERROR, "The home doesn't exist.");
+			if(destination == null) MessageUtils.sendMessage(player, Type.ERROR, "Name given is not associated with a home.");
 			else {
-				MessageUtils.sendMessage(player, Type.INFO, "Home deleted.");
-				config.set(uuid_prefix + home_name, null);
+				MessageUtils.sendMessage(player, Type.INFO, "Home named \"" + home_name + "\" has been deleted.");
+				config.set(uuid_prefix + "|" + home_name, null);
 			}
 		} else return false;
 		return true;
@@ -62,8 +72,9 @@ public class HomeCommands implements CommandExecutor, TabCompleter {
 				Set<String> homes = config.getKeys(false);
 				for(String home : homes) {
 					if(home.length() == 36) continue;
-					String[] parts = home.split("\\|");
-					if(parts[0].equals(uuid_prefix)) options.add(parts[1]);
+					String uuid_part = home.replaceAll("\\|.+$", "");
+					String name_part = home.replaceAll("^.+?\\|", "");
+					if(uuid_part.equals(uuid_prefix)) options.add(name_part);
 				}
 				return options;
 			}

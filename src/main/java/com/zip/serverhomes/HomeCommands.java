@@ -2,7 +2,6 @@ package com.zip.serverhomes;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -65,17 +64,18 @@ public class HomeCommands implements CommandExecutor, TabCompleter {
 		if(!(sender instanceof Player)) return null;
 		if (label.equalsIgnoreCase("home") || label.equalsIgnoreCase("delhome")) {
 			if (args.length == 1) {
-				List<String> options = new LinkedList<String>();
 				Player player = (Player) sender;
 				String alias = config.getString(player.getUniqueId().toString(), "");
 				String uuid_prefix = (alias.isEmpty() ? player.getUniqueId().toString() : alias);
-				Set<String> homes = config.getKeys(false);
-				for(String home : homes) {
-					if(home.length() == 36) continue;
-					String uuid_part = home.replaceAll("\\|.+$", "");
-					String name_part = home.replaceAll("^.+?\\|", "");
-					if(uuid_part.equals(uuid_prefix)) options.add(name_part);
-				}
+				
+				List<String> options = new LinkedList<String>();
+				config.getKeys(false).forEach((String s) -> {
+					if(s.length() == 36) return;
+					if(!s.replaceAll("\\|.+$", "").equals(uuid_prefix)) return;
+					String name = s.replaceAll("^.+?\\|", "");
+					if(!name.contains(args[0])) return;
+					options.add(name);
+				});
 				return options;
 			}
 		}

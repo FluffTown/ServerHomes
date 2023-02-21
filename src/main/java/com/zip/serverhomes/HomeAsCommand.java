@@ -1,7 +1,9 @@
 package com.zip.serverhomes;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -48,9 +50,19 @@ public class HomeAsCommand implements CommandExecutor, TabCompleter {
 	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
 		if(!(sender instanceof Player)) return null;
 		if(args.length == 1) {
+			Set<String> uuids = new HashSet<String>();
+			config.getKeys(false).forEach((String s) -> {
+				if(s.length() == 36) return;
+				uuids.add(s.replaceAll("\\|.+$", ""));
+			});
+			
 			List<String> options = new LinkedList<String>();
 			OfflinePlayer[] seen_players = Bukkit.getOfflinePlayers();
-			for(OfflinePlayer p : seen_players) options.add(p.getName());
+			for(OfflinePlayer p : seen_players) {
+				if(!uuids.contains(p.getUniqueId().toString())) continue;
+				if(!p.getName().contains(args[0])) continue;
+				options.add(p.getName());
+			}
 			return options;
 		}
 		return null;

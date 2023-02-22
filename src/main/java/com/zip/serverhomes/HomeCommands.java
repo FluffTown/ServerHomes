@@ -16,7 +16,11 @@ import com.zip.serverhomes.MessageUtils.Type;
 public class HomeCommands implements CommandExecutor, TabCompleter {
 	
 	private final FileConfiguration config;
-	public HomeCommands(FileConfiguration config) { this.config = config; }
+	DBControl control;
+	public HomeCommands(FileConfiguration config) {
+		this.config = config;
+		this.control = new DBControl();
+	}
 
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!(sender instanceof Player)) {
@@ -49,11 +53,28 @@ public class HomeCommands implements CommandExecutor, TabCompleter {
 		} else if(label.equalsIgnoreCase("sethome")) {
 			if(destination != null) MessageUtils.sendMessage(player, Type.WARN, "Overwriting existing home associated with the given name.");
 			MessageUtils.sendMessage(player, Type.INFO, "Home \"" + home_name + "\" set to your position.");
+
+			//set the home in the
 			config.set(uuid_prefix + "|" + home_name, player.getLocation());
+
+			//set the home in the database
+			control.delete("Homes", "label","\""+home_name+"\"","uuid","\""+uuid_prefix+"\"");
+			control.insert("Homes",new String[] {
+					uuid_prefix,
+					player.getName(),
+					home_name,
+					String.valueOf(player.getLocation().getBlockX()),
+					String.valueOf(player.getLocation().getBlockY()),
+					String.valueOf(player.getLocation().getBlockZ()),
+					player.getLocation().getWorld().getName()
+			});
 		} else if(label.equalsIgnoreCase("delhome")) {
 			if(destination == null) MessageUtils.sendMessage(player, Type.ERROR, "Name given is not associated with a home.");
 			else {
 				MessageUtils.sendMessage(player, Type.INFO, "Home named \"" + home_name + "\" has been deleted.");
+				//delete from database
+				control.delete("Homes", "label","\""+home_name+"\"","uuid","\""+uuid_prefix+"\"");
+				//delete from config
 				config.set(uuid_prefix + "|" + home_name, null);
 			}
 		} else return false;

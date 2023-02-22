@@ -1,6 +1,9 @@
 package com.zip.serverhomes;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class DBControl {
     Connection connection;
@@ -45,7 +48,6 @@ public class DBControl {
     }
     public void delete(String TABLE, String label, String key, String label1, String key1) {
         try {
-            select(TABLE, label1, key1);
             Statement stmt = connection.createStatement();
             String sql = "DELETE FROM "+TABLE+" WHERE "+label+"="+key+" AND "+label1+"="+key1;
             stmt.executeUpdate(sql);
@@ -62,17 +64,34 @@ public class DBControl {
             e.printStackTrace();
         }
     }
-    public void select(String TABLE, String label, String key) {
+    public List<String> select(String TABLE, String label, String key, String key1) {
         try {
             Statement stmt = connection.createStatement();
             String sql = "SELECT * FROM "+TABLE+" WHERE "+label+"="+key;
 
             ResultSet rs = stmt.executeQuery(sql);
-            if(rs.next()) {
-                System.out.println("out uuid: " + rs.getString("label"));
+
+            List<String> out = new ArrayList();
+            while(rs.next()) {
+                out.add(rs.getString(key1));
             }
+            return out;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
+    public ResultSet selectRaw(String TABLE, String label, String key, String label1, String key1) {
+        try {
+            Statement stmt = connection.createStatement();
+            String sql = "SELECT * FROM "+TABLE+" WHERE "+label+"="+key+" AND "+label1+"="+key1;
+
+            ResultSet rs = stmt.executeQuery(sql);
+            return rs;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

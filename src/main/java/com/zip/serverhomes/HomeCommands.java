@@ -1,13 +1,17 @@
 package com.zip.serverhomes;
 
+import java.sql.ResultSet;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
@@ -42,8 +46,33 @@ public class HomeCommands implements CommandExecutor, TabCompleter {
 			MessageUtils.sendMessage(player, Type.WARN, "Effective name will differ from the one given.");
 			home_name = sanitized;
 		}
-		
-		Location destination = config.getLocation(uuid_prefix + "|" + home_name);
+		ResultSet rs = control.selectRaw("Homes", "uuid", "\""+uuid_prefix+"\"", "label", "\""+home_name+"\"");
+		Location destination = null;
+		try {
+			if (rs.next()) {
+				destination = new Location(Bukkit.getWorld(rs.getString("world")), rs.getInt("x"), rs.getInt("y"), rs.getInt("z"));
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		//Location destination = config.getLocation(uuid_prefix + "|" + home_name);
+		//if(label.equalsIgnoreCase("export")) {
+		//	config.getKeys(false).forEach((String s) -> {
+		//		Location home = config.getLocation(s);
+		//		String name = s.split("\\|")[1];
+		//		String UUID = s.split("\\|")[0];
+//
+//				control.insert("Homes",new String[] {
+//						UUID,
+//						"admin",
+//						name,
+//						String.valueOf(home.getBlockX()),
+//						String.valueOf(home.getBlockY()),
+//						String.valueOf(home.getBlockZ()),
+//						home.getWorld().getName()
+//				});
+//			});
+		//} else
 		if(label.equalsIgnoreCase("home")) {
 			if(destination == null) MessageUtils.sendMessage(player, Type.ERROR, "Name given is not associated with a home.");
 			else {
@@ -55,7 +84,7 @@ public class HomeCommands implements CommandExecutor, TabCompleter {
 			MessageUtils.sendMessage(player, Type.INFO, "Home \"" + home_name + "\" set to your position.");
 
 			//set the home in the
-			config.set(uuid_prefix + "|" + home_name, player.getLocation());
+			//config.set(uuid_prefix + "|" + home_name, player.getLocation());
 
 			//set the home in the database
 			control.delete("Homes", "label","\""+home_name+"\"","uuid","\""+uuid_prefix+"\"");
@@ -75,7 +104,7 @@ public class HomeCommands implements CommandExecutor, TabCompleter {
 				//delete from database
 				control.delete("Homes", "label","\""+home_name+"\"","uuid","\""+uuid_prefix+"\"");
 				//delete from config
-				config.set(uuid_prefix + "|" + home_name, null);
+				//config.set(uuid_prefix + "|" + home_name, null);
 			}
 		} else return false;
 		return true;
@@ -89,14 +118,23 @@ public class HomeCommands implements CommandExecutor, TabCompleter {
 				String alias = config.getString(player.getUniqueId().toString(), "");
 				String uuid_prefix = (alias.isEmpty() ? player.getUniqueId().toString() : alias);
 				
-				List<String> options = new LinkedList<String>();
-				config.getKeys(false).forEach((String s) -> {
-					if(s.length() == 36) return;
-					if(!s.replaceAll("\\|.+$", "").equals(uuid_prefix)) return;
-					String name = s.replaceAll("^.+?\\|", "");
-					if(!name.contains(args[0])) return;
-					options.add(name);
+				List<String> options = new LinkedList();
+				control.select("Homes", "uuid", "\""+uuid_prefix+"\"", "label").forEach((String s) -> {
+					//if(s.length() == 36) return;
+					//if(!s.replaceAll("\\|.+$", "").equals(uuid_prefix)) return;
+					//String name = s.replaceAll("^.+?\\|", "");
+					//if(!name.contains(args[0])) return;
+					//options.add(name);
+					if(!s.toLowerCase().contains(args[0].toLowerCase())) return;
+					options.add(s);
 				});
+				//config.getKeys(false).forEach((String s) -> {
+				//	if(s.length() == 36) return;
+				//	if(!s.replaceAll("\\|.+$", "").equals(uuid_prefix)) return;
+				//	String name = s.replaceAll("^.+?\\|", "");
+				//	if(!name.contains(args[0])) return;
+				//	options.add(name);
+				//});
 				return options;
 			}
 		}

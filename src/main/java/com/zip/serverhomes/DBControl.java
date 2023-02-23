@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class DBControl {
-    Connection connection;
+    public Connection connection;
     public static boolean isNumeric(String strNum) {
         if (strNum == null) {
             return false;
